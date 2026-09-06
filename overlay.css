@@ -1,0 +1,53 @@
+#tab-switcher-overlay {
+  --md-surface-dim: #131b25;
+  --md-surface: #1f2935;
+  --md-surface-container: #273443;
+  --md-surface-container-high: #314153;
+  --md-outline: #72849a;
+  --md-on-surface: #e6edf5;
+  --md-on-surface-variant: #c2cddd;
+  --md-primary: #a8c7fa;
+  position: fixed;
+  z-index: 2147483647;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: var(--md-on-surface);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(ellipse 72% 64% at 50% 48%, rgba(168, 199, 250, .16), transparent 72%),
+    radial-gradient(ellipse 48% 42% at 18% 15%, rgba(130, 172, 226, .12), transparent 74%),
+    linear-gradient(135deg, rgba(19, 29, 40, .88), rgba(12, 20, 29, .91));
+  backdrop-filter: blur(16px) saturate(118%);
+  -webkit-backdrop-filter: blur(16px) saturate(118%);
+}
+
+#tab-switcher-overlay * { box-sizing: border-box; }
+.ts-panel { width: min(1180px, 100%); max-height: min(740px, 100%); overflow: auto; padding: 28px; border: 1px solid var(--md-outline); border-radius: 24px; background: linear-gradient(145deg, #2a3949, var(--md-surface)); box-shadow: 0 24px 72px rgba(0, 0, 0, .48), inset 0 1px rgba(255, 255, 255, .04); transition: width .18s ease; }
+.ts-panel.ts-columns-1 { width: min(380px, 100%); }
+.ts-panel.ts-columns-2 { width: min(680px, 100%); }
+.ts-panel.ts-columns-3 { width: min(980px, 100%); }
+.ts-header { display: flex; align-items: center; gap: 11px; margin-bottom: 24px; }
+.ts-title { color: var(--md-on-surface); font-size: 24px; font-weight: 680; letter-spacing: -.6px; }
+.ts-count { display: grid; place-items: center; min-width: 31px; height: 27px; padding: 0 8px; border-radius: 15px; color: #d3e3fd; font-size: 13px; font-weight: 700; background: #42566d; }
+.ts-grid { display: grid; grid-template-columns: repeat(var(--tab-columns, 4), minmax(0, 1fr)); gap: 16px; }
+.ts-card { position: relative; min-width: 0; overflow: hidden; border: 1px solid #4b6076; border-radius: 16px; background: var(--md-surface-container); box-shadow: 0 4px 10px rgba(0, 0, 0, .18); cursor: pointer; transition: background .15s ease, box-shadow .15s ease; }
+.ts-card:hover { background: var(--md-surface-container-high); }
+.ts-card.ts-selected { border-color: var(--md-primary); box-shadow: inset 0 0 0 1px var(--md-primary), 0 8px 20px rgba(0,0,0,.28); }
+.ts-card-head { display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 49px 0 14px; }
+.ts-icon { display: grid; flex: 0 0 auto; place-items: center; width: 20px; height: 20px; overflow: hidden; border-radius: 5px; color: var(--md-on-surface); font-size: 10px; font-weight: 800; line-height: 1; background: #59728c; }
+.ts-icon img { display: block; width: 16px; height: 16px; object-fit: contain; }
+.ts-name { min-width: 0; flex: 1 1 auto; overflow: hidden; color: var(--md-on-surface); font-size: 14px; font-weight: 560; text-overflow: ellipsis; white-space: nowrap; }
+.ts-current { flex: 0 0 auto; padding: 3px 5px; border-radius: 5px; color: #d3e3fd; font-size: 8px; font-weight: 800; letter-spacing: .55px; background: #465b73; }
+.ts-close { position: absolute; z-index: 1; top: 12px; right: 11px; display: grid; place-items: center; width: 27px; height: 27px; padding: 0; border: 0; border-radius: 7px; color: var(--md-on-surface-variant); font: 300 25px/22px system-ui; background: transparent; cursor: pointer; }
+.ts-close:hover { color: white; background: rgba(255,255,255,.12); }
+
+.ts-preview { aspect-ratio: 1.64 / 1; margin: 0 8px 8px; overflow: hidden; border-radius: 10px; background: var(--md-surface-dim); }
+.ts-preview img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.ts-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 100%; padding: 10px; background: linear-gradient(145deg, #3a4b5d, var(--md-surface-dim)); }
+.ts-domain { max-width: 100%; overflow: hidden; color: var(--md-on-surface); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.ts-placeholder small { color: #b5c3d4; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
+@media (max-width: 900px) { .ts-grid { grid-template-columns: repeat(min(var(--tab-columns, 4), 3), minmax(0, 1fr)); } }
+@media (max-width: 660px) { #tab-switcher-overlay { padding: 18px; } .ts-panel { padding: 19px; } .ts-grid { grid-template-columns: repeat(min(var(--tab-columns, 4), 2), minmax(0, 1fr)); gap: 12px; } }
