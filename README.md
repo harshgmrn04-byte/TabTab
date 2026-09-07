@@ -15,6 +15,7 @@ Hold `Ctrl`, tap `Q` to cycle through tabs, release to switch — exactly the wa
 - **In-page overlay** — The switcher appears over the active page, not in a detached popup. No context switch, no flicker.
 - **Most-recently-used ordering** — Tabs are sorted by recency, not by their position in the tab bar. The tab you were just on is always first.
 - **Screenshot previews** — Real captured screenshots of tabs you've visited, cached locally so they load instantly. Unvisited tabs show a branded placeholder.
+- **Preview warm-up on install** — On first install, TabTab quietly cycles through all your open tabs to pre-capture screenshots. By the time you open the switcher, every tab already has a preview.
 - **Keyboard navigation** — `↑` `↓` `←` `→` to move, `Enter` to switch, `Esc` to dismiss.
 - **Mouse support** — Hover to select, click to switch, `×` to close a tab without leaving the switcher.
 - **Close tabs inline** — Close any tab from the overlay without interrupting your flow.
@@ -94,7 +95,7 @@ TabTab has three moving parts:
 
 - **`Cmd+Tab` is reserved** — macOS claims `Cmd+Tab` at the system level before Chrome ever sees it. A browser extension cannot intercept it.
 - **Tab strip is off-limits** — The overlay starts below Chrome's native tab bar. It cannot paint over the browser UI itself.
-- **Screenshots are per-visible-tab** — Chrome only exposes pixels of the currently visible tab. TabTab captures a preview each time you activate a tab and caches it in IndexedDB. Tabs you have never visited show a placeholder until Chrome permits a capture.
+- **Screenshots are per-visible-tab** — Chrome only exposes pixels of the currently visible tab. TabTab captures a preview each time you activate a tab, when a tab finishes loading a new page, and once on first install by cycling through all open tabs. Previews are cached in IndexedDB across sessions.
 - **Protected pages** — Chrome blocks content scripts on `chrome://` URLs, the Chrome Web Store, and a handful of other internal pages. TabTab detects this and automatically opens a fallback popup window instead so the shortcut never gets stuck.
 - **Privacy** — `<all_urls>` host permission is required solely to capture and cache tab screenshots locally. No page content is ever read, transmitted, or stored outside your browser.
 

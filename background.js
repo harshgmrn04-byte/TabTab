@@ -95,6 +95,34 @@ async function cacheVisiblePreview(windowId, tabId) {
   }
 }
 
+chrome.runtime.onInstalled.addListener(async (details) => {
+  if (details.reason !== "install") return;
+  // Let the browser finish setting up before cycling tabs.
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+  await warmAllTabPreviews();
+});
+
+async function warmAllTabPreviews() {
+  const windows = await chrome.windows.getAll({ populate: true });
+  for (const win of windows) {
+    if (!win.tabs || win.type === "popup") continue;
+    const originalTab = win.tabs.find((tab) => tab.active);
+    for (const tab of win.tabs) {
+      // Only capture tabs that have fully loaded; skip protected pages silently.
+      if (!tab.id || tab.status !== "complete") continue;
+      try {
+        await chrome.tabs.update(tab.id, { active: true });
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        await cacheVisiblePreview(win.id, tab.id);
+      } catch { /* Skip tabs that cannot be captured. */ }
+    }
+    // Restore the tab that was active before the warm-up cycle.
+    if (originalTab?.id) {
+      try { await chrome.tabs.update(originalTab.id, { active: true }); } catch {}
+    }
+  }
+}
+
 chrome.runtime.onStartup.addListener(async () => {
   const windows = await chrome.windows.getAll({ populate: true });
   for (const window of windows) {
