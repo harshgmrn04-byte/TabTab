@@ -115,4 +115,4 @@ There is no build step — just edit the source files and reload the extension a
 
 ## License
 
-MIT © [Your Name](https://github.com/YOUR_USERNAME)
+MIT © Harsh Gupta(https://github.com/YOUR_USERNAME)
