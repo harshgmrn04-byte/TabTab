@@ -108,6 +108,14 @@ chrome.tabs.onActivated.addListener(async ({ tabId, windowId }) => {
   void cacheVisiblePreview(windowId, tabId);
 });
 
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  // Re-capture whenever an active tab finishes navigating to a new page so
+  // previews stay fresh without waiting for the user to switch tabs.
+  if (changeInfo.status === "complete" && tab.active) {
+    void cacheVisiblePreview(tab.windowId, tabId);
+  }
+});
+
 chrome.tabs.onRemoved.addListener((tabId, { windowId }) => {
   void deletePreview(windowId, tabId);
   const history = historyByWindow.get(windowId);
@@ -139,6 +147,10 @@ async function openSwitcher({ cycleExistingOverlay = false } = {}) {
     rememberTab(current.id, active.id);
   }
 
+  // Capture the current tab's screenshot before injecting the overlay so the
+  // stored preview never includes the overlay UI itself.
+  if (active?.id) await cacheVisiblePreview(current.id, active.id);
+
   const [tabs, releaseKeys] = await Promise.all([
     getTabsForSwitcher(current.id),
     getConfiguredReleaseKeys()
@@ -148,8 +160,6 @@ async function openSwitcher({ cycleExistingOverlay = false } = {}) {
     await chrome.scripting.insertCSS({ target: { tabId: active.id }, files: ["overlay.css"] });
     await chrome.scripting.executeScript({ target: { tabId: active.id }, files: ["overlay.js"] });
     await chrome.tabs.sendMessage(active.id, { type: "show-overlay", windowId: current.id, tabs, releaseKeys });
-    // Refresh the current preview after the release listener is already installed.
-    if (active?.id) void cacheVisiblePreview(current.id, active.id);
   } catch {
     // Chrome internal pages do not permit content scripts, so retain a usable fallback.
     await chrome.windows.create({
