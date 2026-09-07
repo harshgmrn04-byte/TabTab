@@ -41,7 +41,7 @@ TabTab is not yet on the Chrome Web Store. You can load it as an unpacked extens
 
 1. Clone or download this repository.
    ```
-   git clone https://github.com/YOUR_USERNAME/tabtab.git
+   git clone https://github.com/harshgmrn04-byte/tabtab.git
    ```
 2. Open `chrome://extensions` in Chrome.
 3. Enable **Developer mode** (toggle in the top-right corner).
