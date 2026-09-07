@@ -23,6 +23,25 @@
         <b>Change shortcut</b>, then click the shortcut field next to Tab Switcher
         and press your preferred key combination.
       </p>
+
+      <h2>Key release behaviour</h2>
+      <p>What happens when you release the modifier key while the overlay is open.</p>
+      <section class="ts-option-group">
+        <label class="ts-option">
+          <input type="radio" name="releaseAction" value="switch">
+          <div>
+            <strong>Switch immediately</strong>
+            <span>Releasing the modifier jumps to the selected tab — just like Cmd+Tab.</span>
+          </div>
+        </label>
+        <label class="ts-option">
+          <input type="radio" name="releaseAction" value="browse">
+          <div>
+            <strong>Keep overlay open</strong>
+            <span>Releasing the modifier keeps the overlay visible. Click a tab or press Enter to switch, Esc to dismiss.</span>
+          </div>
+        </label>
+      </section>
     </main>
     <script src="options.js"></script>
   </body>

@@ -10,3 +10,11 @@ document.querySelector("#change").addEventListener("click", async () => {
     shortcut.textContent = "Open chrome://extensions/shortcuts to change it";
   }
 });
+
+const releaseRadios = document.querySelectorAll("input[name='releaseAction']");
+chrome.storage.sync.get({ releaseAction: "switch" }, ({ releaseAction }) => {
+  releaseRadios.forEach((r) => { if (r.value === releaseAction) r.checked = true; });
+});
+releaseRadios.forEach((r) => r.addEventListener("change", () => {
+  chrome.storage.sync.set({ releaseAction: r.value });
+}));

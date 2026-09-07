@@ -179,15 +179,16 @@ async function openSwitcher({ cycleExistingOverlay = false } = {}) {
   // stored preview never includes the overlay UI itself.
   if (active?.id) await cacheVisiblePreview(current.id, active.id);
 
-  const [tabs, releaseKeys] = await Promise.all([
+  const [tabs, releaseKeys, { releaseAction }] = await Promise.all([
     getTabsForSwitcher(current.id),
-    getConfiguredReleaseKeys()
+    getConfiguredReleaseKeys(),
+    chrome.storage.sync.get({ releaseAction: "switch" })
   ]);
   try {
     // Static scripts cover new pages; inject on demand so already-open tabs work too.
     await chrome.scripting.insertCSS({ target: { tabId: active.id }, files: ["overlay.css"] });
     await chrome.scripting.executeScript({ target: { tabId: active.id }, files: ["overlay.js"] });
-    await chrome.tabs.sendMessage(active.id, { type: "show-overlay", windowId: current.id, tabs, releaseKeys });
+    await chrome.tabs.sendMessage(active.id, { type: "show-overlay", windowId: current.id, tabs, releaseKeys, releaseAction });
   } catch {
     // Chrome internal pages do not permit content scripts, so retain a usable fallback.
     await chrome.windows.create({

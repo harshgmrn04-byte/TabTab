@@ -8,6 +8,7 @@
   let selectedIndex = 0;
   let isActivating = false;
   let releaseKeys = new Set(["Control", "Meta", "Alt", "Shift"]);
+  let releaseAction = "switch";
 
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (message.type === "show-overlay") {
@@ -28,6 +29,7 @@
     tabs = message.tabs;
     targetWindowId = message.windowId;
     releaseKeys = new Set(message.releaseKeys || ["Control", "Meta", "Alt", "Shift"]);
+    releaseAction = message.releaseAction || "switch";
     selectedIndex = tabs.length > 1 ? 1 : 0;
     overlay = document.createElement("div");
     overlay.id = "tab-switcher-overlay";
@@ -149,6 +151,7 @@
     }
   }, true);
   function commitOnModifierRelease(event) {
+    if (releaseAction !== "switch") return;
     if (overlay && releaseKeys.has(event.key) && !hasHeldReleaseModifier(event)) activate(tabs[selectedIndex].id);
   }
   function hasHeldReleaseModifier(event) {

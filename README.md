@@ -21,6 +21,7 @@ Hold `Ctrl`, tap `Q` to cycle through tabs, release to switch — exactly the wa
 - **Close tabs inline** — Close any tab from the overlay without interrupting your flow.
 - **Fallback for protected pages** — On Chrome internal pages (`chrome://`, Web Store, etc.) where content scripts are blocked, a clean popup window takes over automatically.
 - **Customisable shortcut** — Remap the trigger key to anything you prefer via `chrome://extensions/shortcuts`.
+- **Configurable key release behaviour** — Choose in Options whether releasing the modifier switches immediately (like Cmd+Tab) or keeps the overlay open so you can browse freely and switch with a click or Enter.
 - **Zero dependencies** — Pure HTML, CSS, and JavaScript. No build step, no node_modules, no framework. Load unpacked and it works.
 
 ---
@@ -79,6 +80,15 @@ TabTab is not yet on the Chrome Web Store. You can load it as an unpacked extens
 
 Go to **`chrome://extensions/shortcuts`** and set a new key combination next to TabTab. Alternatively, open the extension's **Options** page (right-click the toolbar icon → Options) and click **Change shortcut**.
 
+### Options page
+
+Right-click the toolbar icon and select **Options** to configure:
+
+| Setting | Description |
+|---|---|
+| **Shortcut** | Change the trigger key combination |
+| **Key release behaviour** | **Switch immediately** — releasing the modifier jumps to the selected tab (default). **Keep overlay open** — releasing the modifier does nothing; click a tab or press Enter to switch, Esc to dismiss. |
+
 ---
 
 ## How it works
@@ -98,6 +108,19 @@ TabTab has three moving parts:
 - **Screenshots are per-visible-tab** — Chrome only exposes pixels of the currently visible tab. TabTab captures a preview each time you activate a tab, when a tab finishes loading a new page, and once on first install by cycling through all open tabs. Previews are cached in IndexedDB across sessions.
 - **Protected pages** — Chrome blocks content scripts on `chrome://` URLs, the Chrome Web Store, and a handful of other internal pages. TabTab detects this and automatically opens a fallback popup window instead so the shortcut never gets stuck.
 - **Privacy** — `<all_urls>` host permission is required solely to capture and cache tab screenshots locally. No page content is ever read, transmitted, or stored outside your browser.
+
+---
+
+## Changelog
+
+### v1.1.0
+- **New:** Configurable key release behaviour — choose between switching immediately on modifier release or keeping the overlay open until you explicitly click or press Enter (set in Options).
+- **New:** Preview warm-up on first install — TabTab quietly cycles through all open tabs once to pre-capture screenshots so the overlay is populated immediately.
+- **Fix:** The overlay no longer captures itself as a preview screenshot.
+- **Fix:** Previews now update when a tab navigates to a new page, not only when you switch tabs.
+
+### v1.0.0
+- Initial public release.
 
 ---
 
