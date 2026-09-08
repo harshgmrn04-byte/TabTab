@@ -33,7 +33,10 @@ Hold `Ctrl`, tap `Q` to cycle through tabs, release to switch — exactly the wa
 
 | Overlay (4 columns) | Overlay (2 tabs) | Options page |
 |---|---|---|
-| `[screenshot here]` | `[screenshot here]` | `[screenshot here]` |
+| <img width="1710" height="1112" alt="Screenshot 2026-09-07 at 10 56 30 PM" src="https://github.com/user-attachments/assets/2413edd0-b0f1-4206-857e-28eabf8dc844" />
+ | <img width="1710" height="1112" alt="Screenshot 2026-09-09 at 3 50 41 AM" src="https://github.com/user-attachments/assets/81914949-a074-4443-9580-0b6667897bd9" />
+ | <img width="1710" height="1112" alt="image" src="https://github.com/user-attachments/assets/2fbd0bc8-49c7-445c-9ad3-73e6c6b50783" />
+ |
 
 ---
 
