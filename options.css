@@ -130,3 +130,38 @@ section.ts-option-group {
   font-size: 13px;
   color: #8fa4b4;
 }
+
+.ts-capture-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 22px;
+}
+
+.ts-capture-title {
+  display: block;
+  font: 650 15px Inter, ui-sans-serif, system-ui, sans-serif;
+  color: #e5f2fd;
+  margin-bottom: 4px;
+}
+
+#captureStatus {
+  font-size: 13px;
+  color: #8fa4b4;
+  display: block;
+}
+
+.ts-capture-note {
+  margin: 0;
+  padding: 12px 22px;
+  font-size: 12px;
+  color: #6a8092;
+  border-top: 1px solid rgba(161, 201, 233, .10);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}

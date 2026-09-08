@@ -1,6 +1,7 @@
 const historyByWindow = new Map();
 const previews = new Map();
 let previewCacheHydrated = false;
+let isWarmingPreviews = false;
 const PREVIEW_LIMIT = 18;
 
 function previewKey(windowId, tabId) {
@@ -103,23 +104,44 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 });
 
 async function warmAllTabPreviews() {
-  const windows = await chrome.windows.getAll({ populate: true });
-  for (const win of windows) {
-    if (!win.tabs || win.type === "popup") continue;
-    const originalTab = win.tabs.find((tab) => tab.active);
-    for (const tab of win.tabs) {
-      // Only capture tabs that have fully loaded; skip protected pages silently.
-      if (!tab.id || tab.status !== "complete") continue;
+  if (isWarmingPreviews) return;
+  isWarmingPreviews = true;
+  await chrome.storage.local.set({ capturing: true });
+  let originalFocusedWindowId = null;
+  try {
+    // Remember which window the user was in so we can restore focus at the end.
+    const focused = await chrome.windows.getLastFocused();
+    originalFocusedWindowId = focused?.id ?? null;
+    const windows = await chrome.windows.getAll({ populate: true });
+    for (const win of windows) {
+      if (!win.tabs || win.type === "popup") continue;
+      const originalTab = win.tabs.find((tab) => tab.active);
       try {
-        await chrome.tabs.update(tab.id, { active: true });
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        await cacheVisiblePreview(win.id, tab.id);
-      } catch { /* Skip tabs that cannot be captured. */ }
+        // captureVisibleTab only works on the focused window — focus it first.
+        await chrome.windows.update(win.id, { focused: true });
+        await new Promise((resolve) => setTimeout(resolve, 200));
+      } catch {}
+      for (const tab of win.tabs) {
+        // Only capture tabs that have fully loaded; skip protected pages silently.
+        if (!tab.id || tab.status !== "complete") continue;
+        try {
+          await chrome.tabs.update(tab.id, { active: true });
+          await new Promise((resolve) => setTimeout(resolve, 300));
+          await cacheVisiblePreview(win.id, tab.id);
+        } catch {}
+      }
+      // Restore the tab that was active before cycling through this window.
+      if (originalTab?.id) {
+        try { await chrome.tabs.update(originalTab.id, { active: true }); } catch {}
+      }
     }
-    // Restore the tab that was active before the warm-up cycle.
-    if (originalTab?.id) {
-      try { await chrome.tabs.update(originalTab.id, { active: true }); } catch {}
+  } finally {
+    // Return focus to the window the user was originally in.
+    if (originalFocusedWindowId) {
+      try { await chrome.windows.update(originalFocusedWindowId, { focused: true }); } catch {}
     }
+    isWarmingPreviews = false;
+    await chrome.storage.local.set({ capturing: false, lastCapturedAt: Date.now() });
   }
 }
 
@@ -220,6 +242,11 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       .then(() => sendResponse({ ok: true }))
       .catch((error) => sendResponse({ ok: false, error: error.message }));
     return true;
+  }
+
+  if (message.type === "warm-previews") {
+    if (!isWarmingPreviews) warmAllTabPreviews();
+    sendResponse({ ok: true });
   }
 });
 

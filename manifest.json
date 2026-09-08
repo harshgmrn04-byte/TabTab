@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Tab Switcher",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A keyboard-first visual switcher for Chrome tabs.",
   "permissions": ["tabs", "scripting", "storage"],
   "host_permissions": ["<all_urls>"],

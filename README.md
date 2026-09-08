@@ -15,7 +15,7 @@ Hold `Ctrl`, tap `Q` to cycle through tabs, release to switch — exactly the wa
 - **In-page overlay** — The switcher appears over the active page, not in a detached popup. No context switch, no flicker.
 - **Most-recently-used ordering** — Tabs are sorted by recency, not by their position in the tab bar. The tab you were just on is always first.
 - **Screenshot previews** — Real captured screenshots of tabs you've visited, cached locally so they load instantly. Unvisited tabs show a branded placeholder.
-- **Preview warm-up on install** — On first install, TabTab quietly cycles through all your open tabs to pre-capture screenshots. By the time you open the switcher, every tab already has a preview.
+- **Preview warm-up on install** — On first install, TabTab automatically cycles through all your open tabs to pre-capture screenshots so the switcher is fully populated immediately. You can also trigger this manually any time from the Options page.
 - **Keyboard navigation** — `↑` `↓` `←` `→` to move, `Enter` to switch, `Esc` to dismiss.
 - **Mouse support** — Hover to select, click to switch, `×` to close a tab without leaving the switcher.
 - **Close tabs inline** — Close any tab from the overlay without interrupting your flow.
@@ -88,6 +88,7 @@ Right-click the toolbar icon and select **Options** to configure:
 |---|---|
 | **Shortcut** | Change the trigger key combination |
 | **Key release behaviour** | **Switch immediately** — releasing the modifier jumps to the selected tab (default). **Keep overlay open** — releasing the modifier does nothing; click a tab or press Enter to switch, Esc to dismiss. |
+| **Screenshot previews** | **Capture all previews now** — cycles through every open tab and captures a fresh screenshot. Your tabs will briefly flash; this is normal. Shows when the last capture ran. |
 
 ---
 
@@ -112,6 +113,11 @@ TabTab has three moving parts:
 ---
 
 ## Changelog
+
+### v1.2.0
+- **New:** "Capture all previews now" button in Options — manually trigger a full preview warm-up at any time, with live status feedback.
+- **Fix:** Preview warm-up on install now works correctly — `captureVisibleTab` requires the window to be focused, which was missing and caused all captures to fail silently.
+- **Fix:** Original window focus is restored after the warm-up cycle completes.
 
 ### v1.1.0
 - **New:** Configurable key release behaviour — choose between switching immediately on modifier release or keeping the overlay open until you explicitly click or press Enter (set in Options).
