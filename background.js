@@ -1,6 +1,7 @@
 const historyByWindow = new Map();
 const previews = new Map();
 let previewCacheHydrated = false;
+let historyHydratePromise = null;
 let isWarmingPreviews = false;
 const PREVIEW_LIMIT = 18;
 
@@ -69,10 +70,29 @@ async function deletePreview(windowId, tabId) {
   } catch { /* Stale previews are evicted by the bounded cache. */ }
 }
 
-function rememberTab(windowId, tabId) {
+function hydrateHistoryCache() {
+  if (!historyHydratePromise) {
+    historyHydratePromise = chrome.storage.local
+      .get({ tabHistory: {} })
+      .then(({ tabHistory }) => {
+        for (const [windowId, history] of Object.entries(tabHistory)) {
+          historyByWindow.set(Number(windowId), history);
+        }
+      });
+  }
+  return historyHydratePromise;
+}
+
+function persistHistory() {
+  return chrome.storage.local.set({ tabHistory: Object.fromEntries(historyByWindow) });
+}
+
+async function rememberTab(windowId, tabId) {
   if (!windowId || !tabId) return;
+  await hydrateHistoryCache();
   const history = historyByWindow.get(windowId) || [];
   historyByWindow.set(windowId, [tabId, ...history.filter((id) => id !== tabId)].slice(0, 40));
+  void persistHistory();
 }
 
 async function cacheVisiblePreview(windowId, tabId) {
@@ -149,12 +169,12 @@ chrome.runtime.onStartup.addListener(async () => {
   const windows = await chrome.windows.getAll({ populate: true });
   for (const window of windows) {
     const active = window.tabs?.find((tab) => tab.active);
-    if (active?.id) rememberTab(window.id, active.id);
+    if (active?.id) await rememberTab(window.id, active.id);
   }
 });
 
-chrome.tabs.onActivated.addListener(async ({ tabId, windowId }) => {
-  rememberTab(windowId, tabId);
+chrome.tabs.onActivated.addListener(({ tabId, windowId }) => {
+  void rememberTab(windowId, tabId);
   void cacheVisiblePreview(windowId, tabId);
 });
 
@@ -166,14 +186,20 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   }
 });
 
-chrome.tabs.onRemoved.addListener((tabId, { windowId }) => {
+chrome.tabs.onRemoved.addListener(async (tabId, { windowId }) => {
   void deletePreview(windowId, tabId);
+  await hydrateHistoryCache();
   const history = historyByWindow.get(windowId);
-  if (history) historyByWindow.set(windowId, history.filter((id) => id !== tabId));
+  if (history) {
+    historyByWindow.set(windowId, history.filter((id) => id !== tabId));
+    void persistHistory();
+  }
 });
 
-chrome.windows.onRemoved.addListener((windowId) => {
+chrome.windows.onRemoved.addListener(async (windowId) => {
+  await hydrateHistoryCache();
   historyByWindow.delete(windowId);
+  void persistHistory();
 });
 
 chrome.action.onClicked.addListener(() => openSwitcher());
@@ -194,7 +220,7 @@ async function openSwitcher({ cycleExistingOverlay = false } = {}) {
     }
   }
   if (active?.id) {
-    rememberTab(current.id, active.id);
+    await rememberTab(current.id, active.id);
   }
 
   // Capture the current tab's screenshot before injecting the overlay so the
@@ -252,9 +278,10 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
 async function getTabsForSwitcher(windowId) {
   await hydratePreviewCache();
+  await hydrateHistoryCache();
   const tabs = await chrome.tabs.query({ windowId });
   const active = tabs.find((tab) => tab.active);
-  if (active?.id) rememberTab(windowId, active.id);
+  if (active?.id) await rememberTab(windowId, active.id);
 
   const history = historyByWindow.get(windowId) || [];
   const priority = new Map(history.map((id, index) => [id, index]));

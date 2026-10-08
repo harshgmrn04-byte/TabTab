@@ -111,6 +111,9 @@ TabTab has three moving parts:
 
 ## Changelog
 
+### v1.2.1
+- **Fix:** MRU tab order now persists across browser restarts and service worker terminations. Previously the order was stored only in memory and lost every time Chrome killed the background service worker.
+
 ### v1.2.0
 - **New:** "Capture all previews now" button in Options — manually trigger a full preview warm-up at any time, with live status feedback.
 - **Fix:** Preview warm-up on install now works correctly — `captureVisibleTab` requires the window to be focused, which was missing and caused all captures to fail silently.
